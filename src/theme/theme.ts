@@ -12,7 +12,7 @@ interface Theme {
   }
 }
 
-const theme: DefaultTheme = {
+const theme: Theme = {
   fonts: {
     heading: "Impact",
     paragraph: "Arial"
