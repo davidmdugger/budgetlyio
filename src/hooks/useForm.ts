@@ -1,11 +1,10 @@
 import * as React from 'react'
 
-interface Errors {
-  item?: string
-  amount?: number
+export interface Errors {
+  [key: string]: any
 }
 
-export const useForm = (initialState: any) => {
+export const useForm = <T>(initialState: T, validation: () => boolean) => {
   const [values, setValues] = React.useState(initialState);
   const [errors, setErrors] = React.useState<Errors | null>(null)
 
@@ -22,11 +21,14 @@ export const useForm = (initialState: any) => {
     })
   }
 
+  // onSubmitHandler
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     return values
   }
 
+  // onBlur (set errors if user clicks/tabs away from input)
   const handleBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.trim()
 
@@ -38,6 +40,7 @@ export const useForm = (initialState: any) => {
       })
     }
 
+    // check if value is empty (after removing spaces)
     if (value === "") {
       setValues({
         ...values,
@@ -45,6 +48,7 @@ export const useForm = (initialState: any) => {
       })
     }
 
+    // add errors if there are any
     setErrors({
       ...errors,
       [e.target.name]: ''

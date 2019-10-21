@@ -7,6 +7,8 @@ interface Theme {
     primary: string
     secondary: string
     accent: string
+    alert: string
+    white: string
   }
 }
 
@@ -18,7 +20,9 @@ const theme: Theme = {
   colors: {
     primary: "#2128BD",
     secondary: "#FECC58",
-    accent: "#FFE5E4"
+    accent: "#FFE5E4",
+    alert: "#FF0000",
+    white: "#F8F8F8"
   }
 }
 

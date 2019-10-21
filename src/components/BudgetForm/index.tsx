@@ -1,33 +1,36 @@
 import * as React from 'react';
-import { useForm } from "../../hooks/useForm";
 
-interface BudgetItem {
+interface Errors {
+  item?: string
+  amount?: string
+}
+
+interface Props {
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleSubmit: (e: React.FormEvent) => void
+  handleBlur: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleFocus: (e: React.ChangeEvent<HTMLInputElement>) => void
+  errors: null | Errors
   item: string
-  amount: number
+  amount: number | ''
+  errorMessage: string
+  addBudgetItem: (e: React.FormEvent) => void
+  isValid: () => boolean
 }
 
-const budgetItem: BudgetItem = {
-  item: '',
-  amount: 0
-}
+export default ({ handleChange, handleBlur, handleFocus, errors, item, amount, addBudgetItem, isValid }: Props): React.ReactElement => (
+  <form onSubmit={addBudgetItem}>
+    <div>
+      <input type="text" name="item" value={item} onChange={handleChange} onBlur={handleBlur} onFocus={handleFocus} />
+      {errors && errors.item && errors.item.length > 0 && (<div><small>{errors.item}</small></div>)}
+    </div>
 
-export default (): React.ReactElement => {
-  const { handleChange, handleSubmit, handleBlur, handleFocus, errors, values: { item, amount } } = useForm(budgetItem);
+    <div>
+      <input type="number" name="amount" value={amount} onChange={handleChange} onBlur={handleBlur} onFocus={handleFocus} />
+      {errors && errors.amount && (<div><small>{errors.amount}</small></div>)}
+    </div>
 
-  const isSubmitDisabled: boolean = errors === null || Object.keys(errors).length === 0 || amount <= 0;
-  return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <input type="text" name="item" value={item} onChange={handleChange} onBlur={handleBlur} onFocus={handleFocus} />
-        {errors && errors.item && errors.item.length > 0 && (<div><small>{errors.item}</small></div>)}
-      </div>
+    <input disabled={!isValid()} type="submit" value="Add To Budget" />
+  </form>
 
-      <div>
-        <input type="number" name="amount" value={amount} onChange={handleChange} onBlur={handleBlur} onFocus={handleFocus} />
-        {errors && errors.amount && (<div><small>{errors.amount}</small></div>)}
-      </div>
-
-      <input disabled={isSubmitDisabled} type="submit" value="Add To Budget" />
-    </form>
-  )
-}
+)
