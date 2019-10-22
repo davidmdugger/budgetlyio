@@ -26,7 +26,8 @@ export default () => {
   const alertRef: React.RefObject<HTMLDivElement> = React.useRef(null);
 
   React.useEffect(() => {
-    useSetFocus(alertRef)
+    // only invoke useSetFocus hook when Alert is displayed
+    if (isAlertDisplayed) useSetFocus(alertRef)
   }, [errorMessage])
 
   function isValid(): boolean {
