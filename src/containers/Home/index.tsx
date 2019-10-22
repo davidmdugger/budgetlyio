@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useForm } from "../../hooks/useForm";
+import { useSetFocus } from '../../hooks/useSetFocus';
 import HomeTitles from './HomeTitles';
 import BudgetForm from '../../components/BudgetForm';
 import AlertMessage from '../../components/AlertMessage/AlertMessage';
@@ -20,6 +21,13 @@ export default () => {
   const [budgetList, setBudgetList] = React.useState(initialBudgetList);
   const { handleChange, handleSubmit, handleBlur, handleFocus, errors, values: { item, amount } } = useForm(budgetItem, isValid);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [isAlertDisplayed, setAlert] = React.useState(false)
+
+  const alertRef: React.RefObject<HTMLDivElement> = React.useRef(null);
+
+  React.useEffect(() => {
+    useSetFocus(alertRef)
+  }, [errorMessage])
 
   function isValid(): boolean {
     if (item.trim().length === 0) return false
@@ -32,7 +40,10 @@ export default () => {
     const obj = budgetList.find((o: BudgetItem) => o.item === itemToAdd.item);
     const itemNotInList = obj === undefined;
 
-    if (!itemNotInList) setErrorMessage('Yo, you already added that item');
+    if (!itemNotInList) {
+      setErrorMessage('Yo, you already added that item');
+      setAlert(true)
+    }
 
     return itemNotInList;
   }
@@ -42,12 +53,11 @@ export default () => {
     e.preventDefault();
     const itemToAdd: BudgetItem = handleSubmit(e);
 
-    console.log('itemToAdd: ', itemToAdd);
-
     // if item is in budgetList
-    if (!isItemInBudgetList(itemToAdd)) { return; }
+    if (!isItemInBudgetList(itemToAdd)) {
+      return;
+    }
 
-    console.log('is in list: ', isItemInBudgetList(itemToAdd));
 
     if (!isValid()) {
       setErrorMessage('Something is wrong with the form')
@@ -61,9 +71,13 @@ export default () => {
     return budgetList.length > 0 ? budgetList.map((item: BudgetItem) => <div key={item.amount}>{item.item}: {item.amount}</div>) : <div>No items</div>;
   }
 
+  const displayError = (): React.ReactElement => {
+    return <AlertMessage ref={alertRef} message={errorMessage} />
+  }
+
   return (
     <div>
-      {errorMessage.length > 0 && <AlertMessage message={errorMessage} />}
+      {isAlertDisplayed && displayError()}
 
       <HomeTitles />
       <div>Monthly salary goes here</div>
