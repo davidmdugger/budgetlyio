@@ -57,7 +57,7 @@ export const useForm = <T>(initialState: T, validation: () => boolean) => {
     return value
   }
 
-  const handleFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFocus = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value.trim()
 
     if (value === "") {
