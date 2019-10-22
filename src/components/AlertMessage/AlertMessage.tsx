@@ -12,8 +12,10 @@ interface Props {
   message: string
 }
 
-export default ({ message }: Props): React.ReactElement => (
-  <AlertWrapper>
-    {message}
-  </AlertWrapper>
-)
+export default React.forwardRef(({ message }: Props, ref: React.Ref<HTMLDivElement>): React.ReactElement => {
+  return (
+    <AlertWrapper role="alert" ref={ref} tabIndex={-1}>
+      {message}
+    </AlertWrapper>
+  )
+})
