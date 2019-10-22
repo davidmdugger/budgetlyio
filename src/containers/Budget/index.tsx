@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { useForm } from "../../hooks/useForm";
 import { useSetFocus } from '../../hooks/useSetFocus';
-import HomeTitles from './HomeTitles';
+import HomeTitles from './BudgetHeading';
 import BudgetForm from '../../components/BudgetForm';
+import TextInput from '../../library/TextInput/TextInput';
 import AlertMessage from '../../components/AlertMessage/AlertMessage';
 
 export interface BudgetItem {
@@ -20,19 +21,30 @@ const initialBudgetList: BudgetItem[] = []
 export default () => {
   const [budgetList, setBudgetList] = React.useState(initialBudgetList);
   const { handleChange, handleSubmit, handleBlur, handleFocus, errors, values: { item, amount } } = useForm(budgetItem, isValid);
-  const [errorMessage, setErrorMessage] = React.useState('');
-  const [isAlertDisplayed, setAlert] = React.useState(false)
+  const [alertMessage, setAlertMessage] = React.useState('');
 
   const alertRef: React.RefObject<HTMLDivElement> = React.useRef(null);
+  const itemRef: React.RefObject<HTMLSpanElement> = React.useRef(null);
+  const amountRef: React.RefObject<HTMLSpanElement> = React.useRef(null);
 
   React.useEffect(() => {
     // only invoke useSetFocus hook when Alert is displayed
-    if (isAlertDisplayed) useSetFocus(alertRef)
-  }, [errorMessage])
+    if (alertMessage.length > 0) useSetFocus(alertRef)
+
+    if (errors && errors.item.length > 0) {
+      useSetFocus(itemRef)
+      return;
+    }
+
+    if (errors && errors.amount) {
+      useSetFocus(amountRef)
+      return;
+    }
+  }, [alertMessage, errors])
 
   function isValid(): boolean {
-    if (item.trim().length === 0) return false
-    if (amount <= 0) return false
+    if (item.trim().length === 0) return false;
+    if (amount <= 0) return false;
 
     return true;
   }
@@ -42,8 +54,7 @@ export default () => {
     const itemNotInList = obj === undefined;
 
     if (!itemNotInList) {
-      setErrorMessage('Yo, you already added that item');
-      setAlert(true)
+      setAlertMessage('Yo, you already added that item');
     }
 
     return itemNotInList;
@@ -59,13 +70,12 @@ export default () => {
       return;
     }
 
-
     if (!isValid()) {
-      setErrorMessage('Something is wrong with the form')
+      setAlertMessage('Something is wrong with the form');
       return;
     }
 
-    setBudgetList([itemToAdd, ...budgetList])
+    setBudgetList([itemToAdd, ...budgetList]);
   }
 
   const displayBudgetList = (): React.ReactElement[] | React.ReactElement => {
@@ -73,27 +83,43 @@ export default () => {
   }
 
   const displayError = (): React.ReactElement => {
-    return <AlertMessage ref={alertRef} message={errorMessage} />
+    return <AlertMessage ref={alertRef} message={alertMessage} />
   }
 
   return (
     <div>
-      {isAlertDisplayed && displayError()}
+      {alertMessage.length > 0 && displayError()}
 
       <HomeTitles />
-      <div>Monthly salary goes here</div>
-      <BudgetForm
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-        handleBlur={handleBlur}
-        handleFocus={handleFocus}
-        errors={errors}
-        item={item}
-        amount={amount}
-        errorMessage={errorMessage}
-        addBudgetItem={addBudgetItem}
-        isValid={isValid}
-      />
+
+      <BudgetForm handleSubmit={addBudgetItem} isValid={isValid}>
+        <TextInput
+          type="text"
+          name="item"
+          value={item}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          label="Budget Item"
+          errorMsg={errors && errors.item}
+          required={true}
+          ref={itemRef}
+        />
+
+        <TextInput
+          type="number"
+          name="amount"
+          value={amount}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          label="Amount"
+          errorMsg={errors && errors.amount}
+          required={true}
+          ref={amountRef}
+        />
+      </BudgetForm>
+
       {displayBudgetList()}
     </div>
   )

@@ -2,7 +2,7 @@ import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import theme from './theme/theme'
 import GlobalStyles from './theme/GlobalStyles'
-import Home from './containers/Home'
+import Home from './containers/Budget'
 
 const App: React.FC = () => (
   <ThemeProvider theme={theme}>
